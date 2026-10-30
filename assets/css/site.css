@@ -58,7 +58,10 @@ section{padding-block:clamp(64px,8vw,112px)}
 a:hover .arr{transform:translateX(3px)}
 
 /* header: floats over the full-screen hero, turns solid white once you scroll */
-.site-head{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);transition:background .35s,border-color .35s,box-shadow .35s}
+.site-head{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line);transition:border-color .35s,box-shadow .35s}
+/* the frosted background lives on its own layer: a backdrop-filter on the header itself would
+   trap the full-screen phone menu (position:fixed) inside the header bar */
+.site-head::before{content:"";position:absolute;inset:0;z-index:-1;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity .35s}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:24px;padding-block:12px;transition:padding .35s}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
 .brand img{width:44px;height:44px;border-radius:12px;object-fit:cover;background:#fff;border:1px solid var(--line)}
@@ -83,7 +86,8 @@ a:hover .arr{transform:translateX(3px)}
 
 /* with JS: transparent over the photo until the page scrolls */
 .js .site-head{position:fixed;left:0;right:0}
-.js .site-head:not(.solid){background:transparent;border-bottom-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+.js .site-head:not(.solid){border-bottom-color:transparent}
+.js .site-head:not(.solid)::before{opacity:0}
 .js .site-head:not(.solid) .nav{padding-block:20px}
 .js .site-head:not(.solid) .links a:not(.btn){color:rgba(255,255,255,.88);text-shadow:0 1px 12px rgba(36,18,58,.45)}
 .js .site-head:not(.solid) .links a:not(.btn):hover,.js .site-head:not(.solid) .links a[aria-current="page"]:not(.btn){color:#fff}
@@ -107,7 +111,9 @@ a:hover .arr{transform:translateX(3px)}
   .links a[aria-current="page"]:not(.btn)::after{transform:translateY(-50%) scale(1)}
   .links a[aria-current="page"]:not(.btn),.js .site-head:not(.solid) .links a[aria-current="page"]:not(.btn){color:var(--magenta)}
   .links .btn,.js .site-head:not(.solid) .links .btn{margin:24px 0 0;justify-content:center;font-size:1rem;padding:18px;background:var(--btn);color:#fff}
-  .menu-open .site-head{background:var(--surface)!important;border-bottom-color:transparent!important}
+  .menu-open .site-head{border-bottom-color:transparent!important;box-shadow:none!important}
+  .menu-open .site-head::before{opacity:0}
+  .menu-open .brand-logo img{width:44px;height:44px}
   .menu-open #menu-btn{background:var(--tint)!important;color:var(--ink)!important}
   .menu-open body{overflow:hidden}
 }
