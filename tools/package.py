@@ -45,7 +45,7 @@ os.makedirs(os.path.join(ROOT, "dist"), exist_ok=True)
 out = os.path.join(ROOT, "dist", name)
 with zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as z:
     for f in sorted(os.listdir(SITE)):
-        if f.endswith(".html"):
+        if f.endswith(".html") or f == ".htaccess":
             z.write(os.path.join(SITE, f), f)
     for top in WEB:
         for dirpath, _, files in os.walk(os.path.join(SITE, top)):

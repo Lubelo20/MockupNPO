@@ -59,3 +59,19 @@ Put the number in **both** `data-value` and `<b>`, and delete `hidden`. Leave th
 4. cPanel → File Manager → `public_html`: back up and move the old `index.html` and `images/`, then upload and extract the live zip there.
 5. Delete the `preview` folder and remove its Directory Privacy.
 6. Open the site on a phone and send a test WhatsApp message from the Contact page.
+
+## Images and speed
+
+Every photo has a WebP copy next to it (`images/x.jpg` and `images/x.webp`). When the pages are built, each image is
+wrapped in a `<picture>` so browsers download the smaller WebP and older ones fall back to the JPEG. Images below the
+first screen load only as the visitor scrolls, and each page tells the browser to fetch its hero photo first.
+
+When you add a photo, make its WebP copy too, then rebuild:
+
+```
+cwebp -q 78 -m 6 -metadata none images/new-photo.jpg -o images/new-photo.webp
+python3 tools/package.py
+```
+
+Hero photos come in three widths (`hero-x-1000`, `hero-x-1400`, `hero-x`), each as JPEG and WebP.
+`.htaccess` (included in the zip) tells cPanel to cache images, CSS and JS for a year and to compress pages.

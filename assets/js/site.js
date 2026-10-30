@@ -74,7 +74,8 @@
       function shown(){return items.filter(function(it){return !it.hidden})}
       function show(i){
         var v=shown();cur=(i+v.length)%v.length;var it=v[cur],im=it.querySelector('img');
-        big.src=it.querySelector('a').getAttribute('href');big.alt=im.alt;
+        big.src=it.querySelector('a').getAttribute('href').replace(/\.jpg$/,'.webp');  // browsers with <dialog> all read WebP
+        big.alt=im.alt;
         big.width=im.getAttribute('width')*2;big.height=im.getAttribute('height')*2;
         cap.textContent=it.querySelector('figcaption').textContent;
       }

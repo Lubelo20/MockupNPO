@@ -44,7 +44,7 @@ HEAD = """<!doctype html>
 <a class="skip" href="#main">Skip to content</a>
 <header class="site-head">
   <div class="wrap nav">
-    <a class="brand brand-logo" href="index.html" aria-label="Nonkululeko Catherine Foundation, home"><img src="images/logo.jpg" alt="Nonkululeko Catherine Foundation logo" width="56" height="56"></a>
+    <a class="brand brand-logo" href="index.html" aria-label="Nonkululeko Catherine Foundation, home"><picture><source type="image/webp" srcset="images/logo.webp"><img src="images/logo.jpg" alt="Nonkululeko Catherine Foundation logo" width="56" height="56"></picture></a>
     <nav class="links" id="links" aria-label="Main">
 {nav}
       <a class="btn" href="get-involved.html">Get involved <span class="arr">→</span></a>
@@ -60,7 +60,7 @@ FOOT = """</main>
   <div class="wrap">
     <div class="f-top">
       <div class="f-about">
-        <a class="brand" href="index.html"><img src="images/logo.jpg" alt="Nonkululeko Catherine Foundation logo" width="44" height="44"><span><b>Nonkululeko Catherine Foundation</b><small>We care beyond measure</small></span></a>
+        <a class="brand" href="index.html"><picture><source type="image/webp" srcset="images/logo.webp"><img src="images/logo.jpg" alt="Nonkululeko Catherine Foundation logo" width="44" height="44" loading="lazy" decoding="async"></picture><span><b>Nonkululeko Catherine Foundation</b><small>We care beyond measure</small></span></a>
         <p>A registered non-profit in KwaZulu-Natal, empowering teenagers and communities through education, essential resources and care.</p>
         <div class="social">
           <a href="https://www.instagram.com/official_ncf/" target="_blank" rel="noopener" aria-label="Instagram"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg></a>
@@ -96,6 +96,58 @@ NGO = {
 }
 
 
+IMG_TAG = re.compile(r"<img\b[^>]*>")
+
+
+def webp_of(path):
+    """images/x.jpg -> images/x.webp when that file exists, else None."""
+    w = re.sub(r"\.jpe?g$", ".webp", path)
+    return w if w != path and os.path.exists(os.path.join(OUT, w)) else None
+
+
+def optimise_images(html):
+    """Serve WebP with the JPEG as fallback, lazy-load everything but the hero,
+    and return a preload tag for the hero so the browser fetches it first."""
+    preload = ""
+    out, pos = [], 0
+    for m in IMG_TAG.finditer(html):
+        tag = m.group(0)
+        if "data-plain" in tag:  # the gallery viewer swaps this src in JS; a <picture> would override it
+            out.append(html[pos:m.start()] + tag)
+            pos = m.end()
+            continue
+        hero = 'class="hero-bg"' in tag
+        if "decoding=" not in tag:
+            tag = tag[:-1] + ' decoding="async">'
+        if not hero and "loading=" not in tag:
+            tag = tag[:-1] + ' loading="lazy">'
+        inside_picture = html.rfind("<picture", 0, m.start()) > html.rfind("</picture>", 0, m.start())
+        src = re.search(r'src="([^"]+)"', tag).group(1)
+        srcset = re.search(r'srcset="([^"]+)"', tag)
+        sizes = re.search(r'sizes="([^"]+)"', tag)
+        if srcset:
+            parts = [s.strip().split() for s in srcset.group(1).split(",")]
+            webps = [webp_of(u) for u, _ in parts]
+            wset = ", ".join(f"{w} {d}" for w, (_, d) in zip(webps, parts)) if all(webps) else ""
+        else:
+            w = webp_of(src)
+            wset = w or ""
+        if hero and wset and not inside_picture:
+            preload = (f'<link rel="preload" as="image" type="image/webp" imagesrcset="{wset}"'
+                       + (f' imagesizes="{sizes.group(1)}"' if sizes else "") + ' fetchpriority="high">\n')
+        if wset and not inside_picture:
+            tag = (f'<picture><source type="image/webp" srcset="{wset}"'
+                   + (f' sizes="{sizes.group(1)}"' if sizes else "") + f'>{tag}</picture>')
+        out.append(html[pos:m.start()] + tag)
+        pos = m.end()
+    out.append(html[pos:])
+    html = "".join(out)
+    html = re.sub(r'poster="(media/[^"]+)\.jpg"',
+                  lambda m: f'poster="{m.group(1)}.webp"' if os.path.exists(os.path.join(OUT, m.group(1) + ".webp")) else m.group(0),
+                  html)
+    return html, preload
+
+
 def ver(rel):
     """Short content hash so browsers fetch the new file after every change."""
     data = open(os.path.join(OUT, "assets", rel), "rb").read()
@@ -118,6 +170,8 @@ def build():
                 ngo["url"] = SITE_URL
                 ngo["logo"] = SITE_URL + "/images/logo.jpg"
             extra = '<script type="application/ld+json">' + json.dumps(ngo) + "</script>\n"
+        body, preload = optimise_images(body)
+        extra = preload + extra
         og_image = (SITE_URL + "/" if SITE_URL else "") + "images/founder.jpg"
         html = HEAD.format(
             title=meta["title"], desc=meta["desc"], nav=nav, extra_head=extra, og_image=og_image,
@@ -125,7 +179,7 @@ def build():
             v_css=ver("css/site.css"),
         ) + body.rstrip() + "\n" + FOOT.replace("{v_js}", ver("js/site.js"))
         open(os.path.join(OUT, fname), "w", encoding="utf-8").write(html)
-        print("wrote site/" + fname)
+        print("wrote " + fname)
 
 
 if __name__ == "__main__":

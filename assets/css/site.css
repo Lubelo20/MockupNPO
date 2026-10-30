@@ -135,7 +135,7 @@ a:hover .arr{transform:translateX(3px)}
 
 /* home programmes: four photos meeting in one circle */
 .pw-section{position:relative;overflow:hidden;isolation:isolate;border-block:1px solid var(--line)}
-.pw-bg{position:absolute;inset:-60px;z-index:-1;background:url(../../images/maroon.jpg) center/cover;filter:blur(14px) saturate(.9);opacity:.35}
+.pw-bg{position:absolute;inset:-60px;z-index:-1;background:url(../../images/maroon.jpg) center/cover;background-image:image-set(url(../../images/maroon.webp) type("image/webp"),url(../../images/maroon.jpg) type("image/jpeg"));filter:blur(14px) saturate(.9);opacity:.35}
 .pw-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--bg) 70%,transparent),color-mix(in srgb,var(--bg) 55%,transparent) 50%,color-mix(in srgb,var(--bg) 75%,transparent))}
 .pw{--q:clamp(240px,24vw,320px);display:grid;grid-template-columns:minmax(0,1fr) var(--q) var(--q) minmax(0,1fr);grid-template-rows:var(--q) var(--q);gap:22px;align-items:center}
 .pw-item{display:contents}
@@ -472,3 +472,5 @@ footer{padding-block:56px 28px;border-top:1px solid var(--line);background:var(-
 html{scroll-padding-top:80px}
 /* soft shade along the top of the hero so the floating header reads on bright sky */
 .js .hero::after{content:"";position:absolute;left:0;right:0;top:0;height:200px;z-index:-1;pointer-events:none;background:linear-gradient(180deg,rgba(36,18,58,.5),rgba(36,18,58,0))}
+/* <picture> wrappers (added by the build for WebP) shouldn't change layout */
+picture{display:contents}
