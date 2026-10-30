@@ -2,7 +2,6 @@
 WhatsApp*
 .superpowers/
 dist/
-/index.html
-/images/
+/original/
 .DS_Store
 __pycache__/

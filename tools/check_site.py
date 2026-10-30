@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Check the NCF static site against the spec's rules.
 
-Usage: python3 tools/check_site.py [site_dir]
+Usage: python3 tools/check_site.py [site_dir]   (defaults to the repo root)
 Exits 0 and prints "OK n checks", or exits 1 and lists the failures.
 """
 import os
@@ -202,7 +202,7 @@ def check(site):
 
 
 if __name__ == "__main__":
-    site = sys.argv[1] if len(sys.argv) > 1 else "site"
+    site = sys.argv[1] if len(sys.argv) > 1 else os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     fails, n = check(site)
     if fails:
         print(f"FAIL {len(fails)} of {n} checks")

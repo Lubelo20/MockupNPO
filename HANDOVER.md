@@ -8,10 +8,10 @@ There's no database and no build server. cPanel just serves the files.
 | Path | What it is |
 |---|---|
 | `tools/pages/*.html` | **Edit these.** The page content, without header and footer. |
-| `tools/build_pages.py` | Adds the shared header, footer and SEO tags, and writes `site/`. Has the `PREVIEW` and `SITE_URL` switches. |
-| `site/` | The finished website. This is what goes on cPanel. Don't edit it by hand, because it gets overwritten. |
+| `tools/build_pages.py` | Adds the shared header, footer and SEO tags, and writes the pages at the repo root. Has the `PREVIEW` and `SITE_URL` switches. |
+| `*.html`, `assets/`, `images/`, `media/` (repo root) | The finished website. This is what goes on cPanel. Don't edit the `.html` files by hand, because they get overwritten; the CSS and JS in `assets/` are edited directly. |
 | `tools/check_site.py` | Checks links, images, quotes, the WhatsApp number and hidden impact slots. |
-| `tools/package.py` | Rebuilds, checks, and zips `site/` into `dist/`. |
+| `tools/package.py` | Rebuilds, checks, and zips the website into `dist/`. |
 | `index.html`, `images/` (project root) | The old one-page site, kept untouched for reference. |
 
 After any edit, run `python3 tools/package.py`.

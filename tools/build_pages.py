@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Wrap each page body in tools/pages/ with the shared head, header and footer.
 
-Usage: python3 tools/build_pages.py   (writes site/*.html)
+Usage: python3 tools/build_pages.py   (writes the *.html pages at the repo root)
 The output is plain static HTML; nothing here runs on the server.
 Set PREVIEW = False before the public launch to drop the noindex tag.
 """
@@ -13,7 +13,7 @@ import re
 PREVIEW = True
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "tools", "pages")
-OUT = os.path.join(ROOT, "site")
+OUT = ROOT  # the site lives at the repo root so GitHub Pages serves index.html
 SITE_URL = ""  # e.g. "https://www.ncf.org.za" once the domain is known
 
 NAV = [("index.html", "Home"), ("about.html", "Our Story"), ("programmes.html", "Programmes"),
