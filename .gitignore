@@ -1,0 +1,8 @@
+# raw uploads and working files stay local
+WhatsApp*
+.superpowers/
+dist/
+/index.html
+/images/
+.DS_Store
+__pycache__/
